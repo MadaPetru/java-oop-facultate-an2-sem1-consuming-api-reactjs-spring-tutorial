@@ -12,7 +12,7 @@ class AnimalNotFoundAdvice {
     @ResponseBody
     @ExceptionHandler(AnimalNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String employeeNotFoundHandler(AnimalNotFoundException ex) {
+    String animalNotFoundHandler(AnimalNotFoundException ex) {
         return ex.getMessage();
     }
 }
