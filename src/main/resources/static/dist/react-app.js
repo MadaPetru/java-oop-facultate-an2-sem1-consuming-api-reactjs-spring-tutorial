@@ -34052,34 +34052,14 @@ var App = /*#__PURE__*/function (_React$Component) {
   _createClass(App, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      this.loadFromServer(this.state.pageSize);
-    }
-  }, {
-    key: "loadFromServer",
-    value: function loadFromServer(pageSize) {
       var _this2 = this;
-      follow(client, root, [{
-        rel: 'animals',
-        params: {
-          size: pageSize
-        }
-      }]).then(function (animalCollection) {
-        return client({
-          method: 'GET',
-          path: animalCollection.entity._links.self.href,
-          headers: {
-            'Accept': 'application/schema+json'
-          }
-        }).then(function (schema) {
-          _this2.schema = schema.entity;
-          return animalCollection;
-        });
-      }).done(function (animalCollection) {
+      client({
+        method: 'GET',
+        path: '/animals'
+      }).done(function (response) {
+        console.log(response.entity._embedded.animalList);
         _this2.setState({
-          animals: animalCollection.entity._embedded.animalList,
-          attributes: Object.keys(_this2.schema.properties),
-          pageSize: pageSize,
-          links: animalCollection.entity._links
+          animals: response.entity._embedded.animalList
         });
       });
     }
@@ -34088,85 +34068,6 @@ var App = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       return /*#__PURE__*/React.createElement(AnimalList, {
         animals: this.state.animals
-      });
-    }
-  }, {
-    key: "onDelete",
-    value: function onDelete(animal) {
-      var _this3 = this;
-      client({
-        method: 'DELETE',
-        path: animal._links.self.href
-      }).done(function (response) {
-        _this3.loadFromServer(_this3.state.pageSize);
-      });
-    }
-  }, {
-    key: "onCreate",
-    value: function onCreate(newEmployee) {
-      var _this4 = this;
-      follow(client, root, ['animals']).then(function (animalCollection) {
-        return client({
-          method: 'POST',
-          path: animalCollection.entity._links.self.href,
-          entity: newEmployee,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-      }).then(function (response) {
-        return follow(client, root, [{
-          rel: 'animals',
-          params: {
-            'size': _this4.state.pageSize
-          }
-        }]);
-      }).done(function (response) {
-        if (typeof response.entity._links.last !== "undefined") {
-          _this4.onNavigate(response.entity._links.last.href);
-        } else {
-          _this4.onNavigate(response.entity._links.self.href);
-        }
-      });
-    }
-  }, {
-    key: "handleNavFirst",
-    value: function handleNavFirst(e) {
-      e.preventDefault();
-      this.props.onNavigate(this.props.links.first.href);
-    }
-  }, {
-    key: "handleNavPrev",
-    value: function handleNavPrev(e) {
-      e.preventDefault();
-      this.props.onNavigate(this.props.links.prev.href);
-    }
-  }, {
-    key: "handleNavNext",
-    value: function handleNavNext(e) {
-      e.preventDefault();
-      this.props.onNavigate(this.props.links.next.href);
-    }
-  }, {
-    key: "handleNavLast",
-    value: function handleNavLast(e) {
-      e.preventDefault();
-      this.props.onNavigate(this.props.links.last.href);
-    }
-  }, {
-    key: "onNavigate",
-    value: function onNavigate(navUri) {
-      var _this5 = this;
-      client({
-        method: 'GET',
-        path: navUri
-      }).done(function (animalCollection) {
-        _this5.setState({
-          animals: animalCollection.entity._embedded.animalList,
-          attributes: _this5.state.attributes,
-          pageSize: _this5.state.pageSize,
-          links: animalCollection.entity._links
-        });
       });
     }
   }]);
@@ -34181,128 +34082,30 @@ var AnimalList = /*#__PURE__*/function (_React$Component2) {
   _createClass(AnimalList, [{
     key: "render",
     value: function render() {
-      var _this6 = this;
       var animals = this.props.animals.map(function (animal) {
         return /*#__PURE__*/React.createElement(Animal, {
           key: animal._links.self.href,
-          animal: animal,
-          onDelete: _this6.props.onDelete
+          animal: animal
         });
       });
-      var navLinks = [];
-      if ("first" in this.props.links) {
-        navLinks.push( /*#__PURE__*/React.createElement("button", {
-          key: "first",
-          onClick: this.handleNavFirst
-        }, "<<"));
-      }
-      if ("prev" in this.props.links) {
-        navLinks.push( /*#__PURE__*/React.createElement("button", {
-          key: "prev",
-          onClick: this.handleNavPrev
-        }, "<"));
-      }
-      if ("next" in this.props.links) {
-        navLinks.push( /*#__PURE__*/React.createElement("button", {
-          key: "next",
-          onClick: this.handleNavNext
-        }, ">"));
-      }
-      if ("last" in this.props.links) {
-        navLinks.push( /*#__PURE__*/React.createElement("button", {
-          key: "last",
-          onClick: this.handleNavLast
-        }, ">>"));
-      }
-      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
-        ref: "pageSize",
-        defaultValue: this.props.pageSize,
-        onInput: this.handleInput
-      }), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "First Name"), /*#__PURE__*/React.createElement("th", null, "Last Name"), /*#__PURE__*/React.createElement("th", null, "Description"), /*#__PURE__*/React.createElement("th", null)), animals)), /*#__PURE__*/React.createElement("div", null, navLinks));
+      return /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, " Name"), /*#__PURE__*/React.createElement("th", null, " Breed")), animals));
     }
   }]);
   return AnimalList;
 }(React.Component);
 var Animal = /*#__PURE__*/function (_React$Component3) {
   _inherits(Animal, _React$Component3);
-  function Animal(props) {
-    var _this7;
+  function Animal() {
     _classCallCheck(this, Animal);
-    _this7 = _callSuper(this, Animal, [props]);
-    _this7.handleDelete = _this7.handleDelete.bind(_assertThisInitialized(_this7));
-    return _this7;
+    return _callSuper(this, Animal, arguments);
   }
   _createClass(Animal, [{
-    key: "handleDelete",
-    value: function handleDelete() {
-      this.props.onDelete(this.props.animal);
-    }
-  }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, this.props.animal.name), /*#__PURE__*/React.createElement("td", null, this.props.animal.breed), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
-        onClick: this.handleDelete
-      }, "Delete")));
+      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, this.props.animal.name), /*#__PURE__*/React.createElement("td", null, this.props.animal.breed));
     }
   }]);
   return Animal;
-}(React.Component);
-var CreateDialog = /*#__PURE__*/function (_React$Component4) {
-  _inherits(CreateDialog, _React$Component4);
-  function CreateDialog(props) {
-    var _this8;
-    _classCallCheck(this, CreateDialog);
-    _this8 = _callSuper(this, CreateDialog, [props]);
-    _this8.handleSubmit = _this8.handleSubmit.bind(_assertThisInitialized(_this8));
-    return _this8;
-  }
-  _createClass(CreateDialog, [{
-    key: "handleSubmit",
-    value: function handleSubmit(e) {
-      var _this9 = this;
-      e.preventDefault();
-      var newAnimal = {};
-      this.props.attributes.forEach(function (attribute) {
-        newAnimal[attribute] = ReactDOM.findDOMNode(_this9.refs[attribute]).value.trim();
-      });
-      this.props.onCreate(newAnimal);
-
-      // clear out the dialog's inputs
-      this.props.attributes.forEach(function (attribute) {
-        ReactDOM.findDOMNode(_this9.refs[attribute]).value = '';
-      });
-
-      // Navigate away from the dialog to hide it.
-      window.location = "#";
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var inputs = this.props.attributes.map(function (attribute) {
-        return /*#__PURE__*/React.createElement("p", {
-          key: attribute
-        }, /*#__PURE__*/React.createElement("input", {
-          type: "text",
-          placeholder: attribute,
-          ref: attribute,
-          className: "field"
-        }));
-      });
-      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("a", {
-        href: "#createAnimal"
-      }, "Create"), /*#__PURE__*/React.createElement("div", {
-        id: "createAnimal",
-        className: "modalDialog"
-      }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("a", {
-        href: "#",
-        title: "Close",
-        className: "close"
-      }, "X"), /*#__PURE__*/React.createElement("h2", null, "Create new animal"), /*#__PURE__*/React.createElement("form", null, inputs, /*#__PURE__*/React.createElement("button", {
-        onClick: this.handleSubmit
-      }, "Create")))));
-    }
-  }]);
-  return CreateDialog;
 }(React.Component);
 ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById('react-mount-point'));
 
