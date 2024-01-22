@@ -14,10 +14,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class AnimalController {
 
     private final AnimalRepository repository;
+
+    private final AnimalPaginatedRepository animalPaginatedRepository;
     private final AnimalModelAssembler assembler;
 
-    AnimalController(AnimalRepository repository, AnimalModelAssembler assembler) {
+    AnimalController(AnimalRepository repository, AnimalPaginatedRepository animalPaginatedRepository, AnimalModelAssembler assembler) {
         this.repository = repository;
+        this.animalPaginatedRepository = animalPaginatedRepository;
         this.assembler = assembler;
     }
 
