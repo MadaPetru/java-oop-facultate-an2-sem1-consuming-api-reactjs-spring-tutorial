@@ -21,7 +21,7 @@ tasks.register('buildReactApp', NodeTask) {
     script = project.file('node_modules/webpack/bin/webpack.js')
     args = [
             '--mode', 'development',
-            '--entry', './src/main/js/Main.jsx',
+            '--entry', './src/main/js/app.js',
             '-o', './src/main/resources/static/dist/react-app.js'
     ]
 }

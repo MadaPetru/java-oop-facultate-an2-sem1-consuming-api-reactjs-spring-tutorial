@@ -1,3 +1,7 @@
+const React = require('react');
+const ReactDOM = require('react-dom');
+const client = require('./client');
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -7,7 +11,8 @@ class App extends React.Component {
     componentDidMount() {
         client({method: 'GET', path: '/animals'})
             .done(response => {
-                this.setState({animals: response.entity._embedded.animalsList})
+                console.log(response.entity._embedded.animalList);
+                this.setState({animals: response.entity._embedded.animalList})
             })
     }
 
@@ -20,33 +25,35 @@ class App extends React.Component {
 
 class AnimalList extends React.Component {
     render() {
-        const animals = this.props.animals.map(animal=>
-            <Animal key = {animal._links.self.href} animal = {animal}/>
+        const animals = this.props.animals.map(animal =>
+            <Animal key={animal._links.self.href} animal={animal}/>
         );
         return (
             <table>
                 <tbody>
-                    <tr>
-                        <th> Name </th>
-                    </tr>
-                    {animals}
+                <tr>
+                    <th> Name</th>
+                    <th> Breed</th>
+                </tr>
+                {animals}
                 </tbody>
             </table>
         )
     }
 }
 
-class Animal extends React.Component{
-    render(){
+class Animal extends React.Component {
+    render() {
         return (
             <tr>
-                <td>this.props.animal.name</td>
+                <td>{this.props.animal.name}</td>
+                <td>{this.props.animal.breed}</td>
             </tr>
         )
     }
 }
-console.log("adii");
+
 ReactDOM.render(
-    <App />,
-    document.getElementById('react')
+    <App/>,
+    document.getElementById('react-mount-point')
 )
